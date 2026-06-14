@@ -1,4 +1,5 @@
 .data
+.globl utf8_map
 utf8_map: .space 256
 
 .text
