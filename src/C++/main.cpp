@@ -4,7 +4,7 @@ using namespace std;
 signed main() {
     locale::global(locale(""));
     
-    wifstream arquivo("texto.txt");
+    wifstream arquivo("../String.txt");
     arquivo.imbue(locale(""));
     
     if (!arquivo) {
@@ -12,6 +12,7 @@ signed main() {
     }
 
     wstring linha;
+
     getline(arquivo, linha);
 
     unordered_map<wchar_t, wchar_t> acentuadas = {

@@ -11,12 +11,7 @@ main:
     # inicializa a tabela usada para converter
     # caracteres acentuados UTF-8 em letras simples
     jal ra, init_map
-
-    # lê a string
-    li a7, 8
-    la a0, string
-    li a1, 500
-    ecall
+    jal ra, read_input_file
 
     # s0 -> percorre a string original
     # s1 -> escreve na nova string
