@@ -1,6 +1,4 @@
 #include <bits/stdc++.h>
-#include <cwctype>
-#include <fstream>
 using namespace std;
 
 signed main() {
