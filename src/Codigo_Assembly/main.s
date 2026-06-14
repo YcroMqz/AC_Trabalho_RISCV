@@ -1,4 +1,6 @@
 .data
+.globl string
+.globl new_string
     string:     .space 500      # string original lida do teclado
     new_string: .space 500      # string resultante sem acentos/pontuação
 
