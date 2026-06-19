@@ -9,7 +9,8 @@ while true; do
     ESCOLHA=$(whiptail --title "Executor de Scripts" --menu "Selecione uma opção para rodar:" 15 60 4 \
         "1" "Rodar scripts" \
         "2" "Comparação Computacional" \
-        "3" "Sair" 3>&1 1>&2 2>&3)
+	"3" "Comparação Computacional (Sem vista grossa)" \
+        "4" "Sair" 3>&1 1>&2 2>&3)
 
     # Verifica se o usuário apertou "Cancelar" (ESC ou botão Cancelar)
     if [ $? -ne 0 ]; then
@@ -39,17 +40,25 @@ while true; do
 		;;
 		        
 	"2")
-            	echo Comparando as strings...
+            	echo "Comparando as strings..."
+
+		RESULTADO_DIFF=$(diff -sw "$OUT_CPP" "$OUT_S" 2>&1)
+
+		whiptail --title "Comparação de Resultados" \
+			--msgbox "Resultado do diff:\n\n$RESULTADO_DIFF\n\n[ENTER] para voltar." 20 70
+
+	    ;;
+
+	"3")
+		echo "Comparando as string (Sem vista grossa)"
 
 		RESULTADO_DIFF=$(diff "$OUT_CPP" "$OUT_S" 2>&1)
 
 		whiptail --title "Comparação de Resultados" \
 			--msgbox "Resultado do diff:\n\n$RESULTADO_DIFF\n\nPressione [ENTER] para voltar." 20 70
+	;;
 
-	    ;;
-
-	    
-        "3")
+        "4")
             echo "Saindo..."
             break
             ;;

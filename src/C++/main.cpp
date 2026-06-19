@@ -49,5 +49,5 @@ signed main() {
     }
 
     wcout.imbue(locale(""));
-    wcout << s << L'\n';
+    wcout << s << '\n';
 }

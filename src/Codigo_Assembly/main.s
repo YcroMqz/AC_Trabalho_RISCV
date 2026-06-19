@@ -114,6 +114,10 @@ end:
     li a7, 4
     ecall
 
+    li a0, '\n'
+    li a7, 11
+    ecall
+
     # Encerra o programa.
     li a7, 10
     ecall
