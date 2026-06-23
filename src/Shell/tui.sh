@@ -1,69 +1,81 @@
 #!/bin/bash
 
-# Arquivos de saída
-OUT_CPP="resultado_cpp.txt"
-OUT_S="resultado_asm.txt"
+# pega a pasta exata onde o script atual ta salvo.
+# assim nao importa de onde voce chama ele no terminal.
+dir_base="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+# arquivos de saida (agora sempre salvos junto do script).
+out_cpp="$dir_base/resultado_cpp.txt"
+out_s="$dir_base/resultado_asm.txt"
+
+# caminho pro rars flexivel.
+# por padrao procura o rars1_6.jar na mesma pasta deste script.
+# se tiver em outro lugar voce pode alterar o caminho abaixo.
+rars_jar="${RARS_JAR:-$dir_base/rars1_6.jar}"
 
 while true; do
-    # Cria o menu de escolha usando o whiptail
-    ESCOLHA=$(whiptail --title "Executor de Scripts" --menu "Selecione uma opção para rodar:" 15 60 4 \
-        "1" "Rodar scripts" \
-        "2" "Comparação Computacional" \
-	"3" "Comparação Computacional (Sem vista grossa)" \
-        "4" "Sair" 3>&1 1>&2 2>&3)
+    # cria o menu de escolha usando o whiptail.
+    escolha=$(whiptail --title "executor de scripts" --menu "selecione uma opção para rodar:" 15 60 4 \
+        "1" "rodar scripts" \
+        "2" "comparação computacional" \
+        "3" "comparação computacional (sem vista grossa)" \
+        "4" "sair" 3>&1 1>&2 2>&3)
 
-    # Verifica se o usuário apertou "Cancelar" (ESC ou botão Cancelar)
+    # verifica se o usuário apertou "cancelar".
     if [ $? -ne 0 ]; then
-        echo "Operação cancelada pelo usuário."
+        echo "operação cancelada pelo usuário."
         exit 0
     fi
 
-    # Processa a escolha do usuário
-    case $ESCOLHA in
+    # processa a escolha do usuário.
+    case $escolha in
         "1")
-        	echo "Executando o programa C++..."
-            	# --- Execução do Cpp ---
-		if ../C++/main > "$OUT_CPP"; then
-                	whiptail --title "Sucesso [C++]" --msgbox "Script C++ executado!\nResultado salvo em: $OUT_CPP\n\nPressione [ENTER] para voltar ao menu." 10 50     
-		else
-        		whiptail --title "Erro" --msgbox "Falha ao executar o programa C++." 8 45
-        	fi
-		
-		# --- Execução do programa Assembly ---  
-		echo "Executando o programa em Assembly..."
-	    
-		if java -jar /home/hillan/.cache/yay/rars/rars1_6.jar nc ../Codigo_Assembly/*.s > "$OUT_S"; then
-		    	whiptail --title "Sucesso" --msgbox "Script Assembly executado!\nResultado salvo em: $OUT_CPP\n\nPressione [ENTER] para voltar ao menu." 10 50   		
-		else
-			whiptail --title "Erro" --msgbox "Falha ao executar o programa Assembly" 8 45
-		fi 
-		;;
-		        
-	"2")
-            	echo "Comparando as strings..."
+            echo "executando o programa c++..."
+            
+            # --- execução do cpp ---
+            if "$dir_base/../C++/main" > "$out_cpp"; then
+                whiptail --title "sucesso [c++]" --msgbox "script c++ executado!\nresultado salvo em:\n$out_cpp\n\npressione [enter] para voltar." 10 60     
+            else
+                whiptail --title "erro" --msgbox "falha ao executar o programa c++." 8 45
+            fi
+            
+            # --- execução do programa assembly ---  
+            echo "executando o programa em assembly..."
+            
+            # checa se o jar do rars existe pra evitar erros confusos na tela.
+            if [ ! -f "$rars_jar" ]; then
+                whiptail --title "erro" --msgbox "rars nao encontrado em:\n$rars_jar\n\ncoloque o jar na pasta ou mude o caminho no script." 12 60
+            elif java -jar "$rars_jar" nc "$dir_base/../Codigo_Assembly/"*.s > "$out_s"; then
+                whiptail --title "sucesso" --msgbox "script assembly executado!\nresultado salvo em:\n$out_s\n\npressione [enter] para voltar." 10 60            
+            else
+                whiptail --title "erro" --msgbox "falha ao executar o programa assembly." 8 45
+            fi 
+            ;;
+ 
+        "2")
+            echo "comparando as strings..."
+            
+            resultado_diff=$(diff -sw "$out_cpp" "$out_s" 2>&1)
+            
+            whiptail --title "comparação de resultados" \
+                --msgbox "resultado do diff:\n\n$resultado_diff\n\n[enter] para voltar." 20 70
+            ;;
 
-		RESULTADO_DIFF=$(diff -sw "$OUT_CPP" "$OUT_S" 2>&1)
-
-		whiptail --title "Comparação de Resultados" \
-			--msgbox "Resultado do diff:\n\n$RESULTADO_DIFF\n\n[ENTER] para voltar." 20 70
-
-	    ;;
-
-	"3")
-		echo "Comparando as string (Sem vista grossa)"
-
-		RESULTADO_DIFF=$(diff "$OUT_CPP" "$OUT_S" 2>&1)
-
-		whiptail --title "Comparação de Resultados" \
-			--msgbox "Resultado do diff:\n\n$RESULTADO_DIFF\n\nPressione [ENTER] para voltar." 20 70
-	;;
+        "3")
+            echo "comparando as strings (sem vista grossa)..."
+            
+            resultado_diff=$(diff "$out_cpp" "$out_s" 2>&1)
+            
+            whiptail --title "comparação de resultados" \
+                --msgbox "resultado do diff:\n\n$resultado_diff\n\npressione [enter] para voltar." 20 70
+        ;;
 
         "4")
-            echo "Saindo..."
+            echo "saindo..."
             break
             ;;
         *)
-            whiptail --title "Erro" --msgbox "Opção inválida." 8 45
+            whiptail --title "erro" --msgbox "opção inválida." 8 45
             ;;
     esac
 done
