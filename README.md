@@ -137,6 +137,13 @@ resultado_asm.txt
 
 ## Como Executar
 
+Primeiramente clone o repositório:
+
+```bash
+git clone git@github.com:YcroMqz/AC_Trabalho_RISCV.git
+cd AC_Trabalho_RISCV
+```
+
 A partir da pasta do script:
 
 ```bash
